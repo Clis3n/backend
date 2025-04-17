@@ -21,12 +21,11 @@ app.use(express.json());
 // Middleware CORS (dengan dukungan kredensial)
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:5173', // Ganti dengan URL frontend Anda
-    credentials: true, // Izinkan pengiriman kredensial (cookie)
+    origin: process.env.CLIENT_URL,
+    credentials: true,
   })
 );
 
-// Middleware Session
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -34,8 +33,8 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // Gunakan HTTPS di produksi
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // Sesuaikan dengan mode produksi
+      secure: true, // penting untuk domain HTTPS seperti vercel.app
+      sameSite: 'none', // wajib untuk cross-origin (frontend & backend beda domain)
     },
   })
 );
