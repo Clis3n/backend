@@ -69,9 +69,10 @@ app.use((err, req, res, next) => {
 // Jalankan Server
 const PORT = process.env.PORT || 8080;
 app
-  .listen(PORT, () => {
+  .listen(PORT, '0.0.0.0', () => {
     console.log(`✅ Server running on port ${PORT}`);
   })
   .on('error', (err) => {
     console.error('❌ Server failed to start:', err.message);
   });
+
