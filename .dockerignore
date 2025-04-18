@@ -4,4 +4,4 @@ npm-debug.log
 Dockerfile
 .git
 .gitignore
-EXPOSE 8080
+
