@@ -12,6 +12,9 @@ require('./config/passport');
 // Inisialisasi Express
 const app = express();
 
+// 💥 Tambahkan ini agar Express ngerti kamu di belakang HTTPS proxy (seperti Railway)
+app.set('trust proxy', 1);
+
 // Koneksi ke MongoDB
 connectDB();
 
@@ -75,4 +78,4 @@ app
   .on('error', (err) => {
     console.error('❌ Server failed to start:', err.message);
   });
-
+  
