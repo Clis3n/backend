@@ -47,15 +47,9 @@ app.use(passport.session());
 app.use('/auth', authRoutes);
 
 // Endpoint Root
-app.get('/auth/user', (req, res) => {
-  if (!req.isAuthenticated()) {
-    return res.status(401).json({ message: 'Not authenticated' });
-  }
-
-  const { name, email, picture } = req.user;
-  res.json({ user: { name, email, picture } });
+app.get('/', (req, res) => {
+  res.send('✅ Server is running!');
 });
-
 
 // Endpoint untuk Mendapatkan Data Pengguna
 app.get('/api/user', (req, res) => {
