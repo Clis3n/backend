@@ -8,50 +8,52 @@ passport.use(
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: process.env.GOOGLE_CALLBACK_URL,
-      scope: ['profile', 'email'],
+      scope: ['profile', 'email'],  // Tentukan scope yang sesuai
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        console.log('🔍 Google Profile:', profile);
+        console.log('Google Profile:', profile);
 
-        // Cek apakah user sudah ada berdasarkan googleId
+        // Cari apakah pengguna sudah ada berdasarkan googleId
         let user = await User.findOne({ googleId: profile.id });
 
-        if (user) {
-          return done(null, user);
+        // Jika pengguna belum ada, buat pengguna baru
+        if (!user) {
+          user = new User({
+            googleId: profile.id,
+            name: profile.displayName,
+            email: profile.emails?.[0]?.value || '',  // Ambil email pertama
+            avatar: profile.photos?.[0]?.value || '', // Ambil avatar foto profil
+            role: 'user', // Tentukan role default sebagai 'user'
+          });
+
+          // Simpan pengguna baru ke database
+          await user.save();
         }
 
-        // Jika belum, buat user baru dengan role default 'user'
-        user = await User.create({
-          googleId: profile.id,
-          name: profile.displayName,
-          email: profile.emails?.[0]?.value || '',
-          avatar: profile.photos?.[0]?.value || '',
-          role: 'user', // ✅ default role
-        });
-
-        return done(null, user);
-      } catch (err) {
-        console.error('❌ Google Auth Error:', err);
-        return done(err, null);
+        // Kirimkan pengguna ke passport
+        done(null, user);
+      } catch (error) {
+        console.error('Google Auth Error:', error);
+        done(error, null);
       }
     }
   )
 );
 
-// Serialize: simpan ID user ke session
+// Serialize: simpan ID pengguna ke session
 passport.serializeUser((user, done) => {
   done(null, user.id);
 });
 
-// Deserialize: ambil user lengkap dari ID session
+// Deserialize: ambil data pengguna lengkap berdasarkan ID session
 passport.deserializeUser(async (id, done) => {
   try {
     const user = await User.findById(id);
     done(null, user);
-  } catch (err) {
-    console.error('❌ Deserialize Error:', err);
-    done(err, null);
+  } catch (error) {
+    console.error('Deserialize Error:', error);
+    done(error, null);
   }
 });
 
