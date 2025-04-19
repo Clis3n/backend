@@ -4,11 +4,11 @@ const UserSchema = new mongoose.Schema({
   googleId: { type: String, required: true },
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
-  avatar: { type: String }, // Ini penting, bukan picture
+  avatar: { type: String },
   role: {
     type: String,
-    enum: ['user'],
-    default: 'user', // WAJIB: default 'user'
+    enum: ['user', 'admin'],
+    default: 'user', // Peran default adalah 'user'
   },
 });
 
