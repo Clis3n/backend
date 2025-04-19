@@ -7,7 +7,7 @@ router.get('/google', passport.authenticate('google', { scope: ['profile', 'emai
 
 // Callback setelah login berhasil
 router.get('/google/callback', passport.authenticate('google', { failureRedirect: '/' }), (req, res) => {
-  res.redirect(`${process.env.CLIENT_URL}/Home`);
+  res.redirect(`${process.env.CLIENT_URL}/Home`); // Redirect ke halaman utama setelah login
 });
 
 // Endpoint untuk logout
@@ -38,8 +38,8 @@ router.get('/user', (req, res) => {
     return res.status(401).json({ message: 'Not authenticated' });
   }
 
-  const { name, email, picture } = req.user; // Ambil hanya properti yang diperlukan
-  res.json({ user: { name, email, picture } });
+  const { name, email, picture, role } = req.user; // Ambil hanya properti yang diperlukan
+  res.json({ user: { name, email, picture, role } }); // Termasuk peran pengguna
 });
 
 module.exports = router;
