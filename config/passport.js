@@ -12,36 +12,47 @@ passport.use(
     },
     async (accessToken, refreshToken, profile, done) => {
       try {
-        console.log('Google Profile:', profile);
+        console.log('🔍 Google Profile:', profile);
 
-        const existingUser = await User.findOne({ googleId: profile.id });
+        // Cek apakah user sudah ada berdasarkan googleId
+        let user = await User.findOne({ googleId: profile.id });
 
-        if (existingUser) {
-          return done(null, existingUser);
+        if (user) {
+          return done(null, user);
         }
 
-        const newUser = await User.create({
+        // Jika belum, buat user baru dengan role default 'user'
+        user = await User.create({
           googleId: profile.id,
           name: profile.displayName,
-          email: profile.emails[0].value,
-          avatar: profile.photos[0].value,
+          email: profile.emails?.[0]?.value || '',
+          avatar: profile.photos?.[0]?.value || '',
+          role: 'user', // ✅ default role
         });
 
-        return done(null, newUser);
+        return done(null, user);
       } catch (err) {
+        console.error('❌ Google Auth Error:', err);
         return done(err, null);
       }
     }
   )
 );
 
+// Serialize: simpan ID user ke session
 passport.serializeUser((user, done) => {
   done(null, user.id);
 });
 
+// Deserialize: ambil user lengkap dari ID session
 passport.deserializeUser(async (id, done) => {
-  const user = await User.findById(id);
-  done(null, user);
+  try {
+    const user = await User.findById(id);
+    done(null, user);
+  } catch (err) {
+    console.error('❌ Deserialize Error:', err);
+    done(err, null);
+  }
 });
 
 module.exports = passport;
